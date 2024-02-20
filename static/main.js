@@ -3,7 +3,7 @@ const main__chat__window = document.getElementById("main__chat_window");
 const videoGrids = document.getElementById("video-grids");
 const myVideo = document.createElement("video");
 const chat = document.getElementById("chat");
-OtherUsername = "";
+let OtherUsername = "";
 chat.hidden = true;
 myVideo.muted = true;
 
@@ -26,7 +26,7 @@ var getUserMedia =
     navigator.webkitGetUserMedia ||
     navigator.mozGetUserMedia;
 
-sendmessage = (text) => {
+const sendmessage = (text) => {
     if (event.key === "Enter" && text.value != "") {
         socket.emit("messagesend", myname + ' : ' + text.value);
         text.value = "";
@@ -88,9 +88,9 @@ socket.on("AddName", (username) => {
 
 const RemoveUnusedDivs = () => {
     //
-    alldivs = videoGrids.getElementsByTagName("div");
+    let alldivs = videoGrids.getElementsByTagName("div");
     for (var i = 0; i < alldivs.length; i++) {
-        e = alldivs[i].getElementsByTagName("video").length;
+        const e = alldivs[i].getElementsByTagName("video").length;
         if (e == 0) {
             alldivs[i].remove();
         }
