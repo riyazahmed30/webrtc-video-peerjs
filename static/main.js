@@ -34,6 +34,12 @@ const sendmessage = (text) => {
   }
 };
 
+const sendPostMessageToParent = (msgObj) => {
+  if (window.parent) {
+    window.parent.postMessage(msgObj, "*");
+  }
+};
+
 navigator.mediaDevices
   .getUserMedia({
     video: true,
@@ -42,6 +48,7 @@ navigator.mediaDevices
   .then((stream) => {
     myVideoStream = stream;
     addVideoStream(myVideo, stream, myname);
+    sendPostMessageToParent({ eventType: "userconnect" });
 
     socket.on("user-connected", (id, username) => {
       console.log("userid:" + id);
@@ -154,6 +161,11 @@ const showchat = () => {
   } else {
     chat.hidden = false;
   }
+};
+
+const endCall = () => {
+  sendPostMessageToParent({ eventType: "endCall" });
+  window.location.replace("/");
 };
 
 const addVideoStream = (videoEl, stream, name) => {
