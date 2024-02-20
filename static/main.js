@@ -9,7 +9,7 @@ myVideo.muted = true;
 
 window.onload = () => {
   $(document).ready(function () {
-    $("#getCodeModal").modal("show");
+    // $("#getCodeModal").modal("show");
   });
 };
 
