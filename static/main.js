@@ -117,8 +117,9 @@ const cancel = () => {
 };
 
 const copy = async () => {
+  const origin = window.location.origin;
   const roomid = document.getElementById("roomid").innerText;
-  await navigator.clipboard.writeText("http://localhost:3030/join/" + roomid);
+  await navigator.clipboard.writeText(`${origin}/join/${roomid}`);
 };
 const invitebox = () => {
   $("#getCodeModal").modal("show");
