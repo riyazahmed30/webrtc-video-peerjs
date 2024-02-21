@@ -106,6 +106,11 @@ socket.on("AddName", (username) => {
   console.log(username);
 });
 
+socket.on("endCallForAll", (id) => {
+  if (peers[id]) peers[id].close();
+  endCall();
+});
+
 const RemoveUnusedDivs = () => {
   //
   let alldivs = videoGrids.getElementsByTagName("div");
@@ -199,6 +204,12 @@ const showchat = () => {
 const endCall = () => {
   sendPostMessageToParent({ eventType: "endCall" });
   window.location.replace("/");
+};
+
+const endCallForAll = () => {
+  sendPostMessageToParent({ eventType: "endCallForAll" });
+  window.location.replace("/");
+  socket.emit("endCallForAll", myUserId);
 };
 
 const addVideoStream = (videoEl, stream, name) => {
