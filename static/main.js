@@ -3,6 +3,7 @@ const main__chat__window = document.getElementById("main__chat_window");
 const videoGrids = document.getElementById("video-grids");
 const myVideo = document.createElement("video");
 const chat = document.getElementById("chat");
+const isPeerCall = false; // future purpose
 let OtherUsername = "";
 chat.hidden = true;
 // myVideo.muted = true;
@@ -19,9 +20,7 @@ var peer = new Peer(undefined, {
   port: window.location.port,
 });
 
-let myUserId = "";
 let screenStream;
-let currentPeer = null;
 let screenSharing = false;
 let myVideoStream;
 const peers = {};
@@ -52,11 +51,9 @@ navigator.mediaDevices
   .then((stream) => {
     myVideoStream = stream;
     addVideoStream(myVideo, stream, myname);
-    sendPostMessageToParent({ eventType: "userconnect" });
 
     socket.on("user-connected", (id, username) => {
       console.log("userid:" + id);
-      myUserId = id;
       connectToNewUser(id, stream, username);
       socket.emit("tellName", myname);
     });
@@ -90,6 +87,7 @@ peer.on("call", (call) => {
 });
 
 peer.on("open", (id) => {
+  sendPostMessageToParent({ eventType: "userconnect" });
   socket.emit("join-room", roomId, id, myname);
 });
 
@@ -122,6 +120,15 @@ const RemoveUnusedDivs = () => {
   }
 };
 
+const replaceStreams = (peerObj, streamData) => {
+  let videoTrack = streamData.getVideoTracks()[0];
+  peerObj.peerConnection?.getSenders().map((sender) => {
+    if (sender.track.kind == videoTrack.kind) {
+      sender.replaceTrack(videoTrack);
+    }
+  });
+};
+
 const connectToNewUser = (userId, streams, myname) => {
   const call = peer.call(userId, streams);
   const video = document.createElement("video");
@@ -135,14 +142,9 @@ const connectToNewUser = (userId, streams, myname) => {
   peers[userId] = call;
 
   if (screenSharing) {
-    console.log("sharee");
-    /*
-    let videoTrack = screenStream.getVideoTracks()[0];
-    let sender = call.peerConnection.getSenders().find(function (s) {
-      return s.track.kind == videoTrack.kind;
-    });
-    sender.replaceTrack(videoTrack);
-    */
+    setTimeout(() => {
+      replaceStreams(call, screenStream);
+    }, 1000); // dont remove this timeout
   }
 };
 
@@ -209,7 +211,7 @@ const endCall = () => {
 const endCallForAll = () => {
   sendPostMessageToParent({ eventType: "endCallForAll" });
   window.location.replace("/");
-  socket.emit("endCallForAll", myUserId);
+  socket.emit("endCallForAll", "");
 };
 
 const addVideoStream = (videoEl, stream, name) => {
@@ -251,29 +253,41 @@ function startScreenShare() {
   if (screenSharing) {
     stopScreenSharing();
   }
-  navigator.mediaDevices.getDisplayMedia({ video: true }).then((stream) => {
-    setScreenSharingStream(stream);
-
+  const options = {
+    audio: true,
+    video: { displaySurface: "monitor" },
+  };
+  navigator.mediaDevices.getDisplayMedia(options).then((stream) => {
     screenStream = stream;
-    // const video = document.createElement("video");
-    // addVideoStream(video, stream, "screenshare1");
+    let video;
+    if (isPeerCall) {
+      video = document.createElement("video");
+      addVideoStream(video, stream, "screenshare1");
+    } else {
+      setScreenSharingStream(stream);
+    }
 
     let videoTrack = screenStream.getVideoTracks()[0];
     videoTrack.onended = () => {
-      stopScreenSharing();
-      // video.remove();
-      // RemoveUnusedDivs();
+      if (isPeerCall) {
+        video.remove();
+        RemoveUnusedDivs();
+        document.getElementById("screenShare").style.visibility = "visible";
+        screenSharing = false;
+      } else {
+        stopScreenSharing();
+      }
     };
     if (peer) {
-      //  peer.call(myUserId, stream);
-      Object.keys(peers).forEach((item) => {
-        currentPeer = peers[item];
-        currentPeer.peerConnection?.getSenders().map((sender) => {
-          if (sender.track.kind == videoTrack.kind) {
-            sender.replaceTrack(videoTrack);
-          }
+      if (isPeerCall) {
+        Object.keys(peers).forEach((item) => {
+          peer.call(item, stream);
         });
-      });
+      } else {
+        Object.keys(peers).forEach((item) => {
+          replaceStreams(peers[item], screenStream);
+        });
+      }
 
       document.getElementById("screenShare").style.visibility = "hidden";
       screenSharing = true;
@@ -284,15 +298,9 @@ function startScreenShare() {
 function stopScreenSharing() {
   if (!screenSharing) return;
   stopScreenSharingStream();
-  let videoTrack = myVideoStream.getVideoTracks()[0];
   if (peer) {
     Object.keys(peers).forEach((item) => {
-      currentPeer = peers[item];
-      currentPeer.peerConnection?.getSenders().map((sender) => {
-        if (sender.track.kind == videoTrack.kind) {
-          sender.replaceTrack(videoTrack);
-        }
-      });
+      replaceStreams(peers[item], myVideoStream);
     });
   }
   screenStream.getTracks().forEach(function (track) {
