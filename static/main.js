@@ -19,6 +19,7 @@ var peer = new Peer(undefined, {
   port: window.location.port,
 });
 
+let myUserId = "";
 let screenStream;
 let currentPeer = null;
 let screenSharing = false;
@@ -55,6 +56,7 @@ navigator.mediaDevices
 
     socket.on("user-connected", (id, username) => {
       console.log("userid:" + id);
+      myUserId = id;
       connectToNewUser(id, stream, username);
       socket.emit("tellName", myname);
     });
@@ -73,6 +75,12 @@ peer.on("call", (call) => {
       call.on("stream", function (remoteStream) {
         addVideoStream(video, remoteStream, OtherUsername);
       });
+
+      call.on("close", function () {
+        video.remove();
+        RemoveUnusedDivs();
+      });
+
       peers[call.peer] = call;
     },
     function (err) {
@@ -113,7 +121,6 @@ const connectToNewUser = (userId, streams, myname) => {
   const call = peer.call(userId, streams);
   const video = document.createElement("video");
   call.on("stream", (userVideoStream) => {
-    //       console.log(userVideoStream);
     addVideoStream(video, userVideoStream, myname);
   });
   call.on("close", () => {
@@ -237,11 +244,17 @@ function startScreenShare() {
     setScreenSharingStream(stream);
 
     screenStream = stream;
+    // const video = document.createElement("video");
+    // addVideoStream(video, stream, "screenshare1");
+
     let videoTrack = screenStream.getVideoTracks()[0];
     videoTrack.onended = () => {
       stopScreenSharing();
+      // video.remove();
+      // RemoveUnusedDivs();
     };
     if (peer) {
+      //  peer.call(myUserId, stream);
       Object.keys(peers).forEach((item) => {
         currentPeer = peers[item];
         currentPeer.peerConnection?.getSenders().map((sender) => {
