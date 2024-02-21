@@ -5,7 +5,7 @@ const myVideo = document.createElement("video");
 const chat = document.getElementById("chat");
 let OtherUsername = "";
 chat.hidden = true;
-myVideo.muted = true;
+// myVideo.muted = true;
 
 window.onload = () => {
   $(document).ready(function () {
@@ -19,6 +19,9 @@ var peer = new Peer(undefined, {
   port: window.location.port,
 });
 
+let screenStream;
+let currentPeer = null;
+let screenSharing = false;
 let myVideoStream;
 const peers = {};
 var getUserMedia =
@@ -70,6 +73,7 @@ peer.on("call", (call) => {
       call.on("stream", function (remoteStream) {
         addVideoStream(video, remoteStream, OtherUsername);
       });
+      peers[call.peer] = call;
     },
     function (err) {
       console.log("Failed to get local stream", err);
@@ -117,6 +121,17 @@ const connectToNewUser = (userId, streams, myname) => {
     RemoveUnusedDivs();
   });
   peers[userId] = call;
+
+  if (screenSharing) {
+    console.log("sharee");
+    /*
+    let videoTrack = screenStream.getVideoTracks()[0];
+    let sender = call.peerConnection.getSenders().find(function (s) {
+      return s.track.kind == videoTrack.kind;
+    });
+    sender.replaceTrack(videoTrack);
+    */
+  }
 };
 
 const cancel = () => {
@@ -134,24 +149,35 @@ const invitebox = () => {
 
 const muteUnmute = () => {
   const enabled = myVideoStream.getAudioTracks()[0].enabled;
+  var element = document.getElementById("mute-icon");
+  var muteText = document.getElementById("muteText");
   if (enabled) {
     myVideoStream.getAudioTracks()[0].enabled = false;
-    document.getElementById("mic").style.color = "red";
+    element.classList.add("fa-microphone-slash");
+    element.classList.remove("fa-microphone");
+    muteText.innerHTML = "Unmute";
   } else {
-    document.getElementById("mic").style.color = "white";
     myVideoStream.getAudioTracks()[0].enabled = true;
+    element.classList.add("fa-microphone");
+    element.classList.remove("fa-microphone-slash");
+    muteText.innerHTML = "Mute";
   }
 };
 
 const VideomuteUnmute = () => {
   const enabled = myVideoStream.getVideoTracks()[0].enabled;
-  console.log(getUserMedia);
+  var element = document.getElementById("video-icon");
+  var videoText = document.getElementById("videoText");
   if (enabled) {
     myVideoStream.getVideoTracks()[0].enabled = false;
-    document.getElementById("video").style.color = "red";
+    element.classList.add("fa-video-slash");
+    element.classList.remove("fa-video");
+    videoText.innerHTML = "Start Video";
   } else {
-    document.getElementById("video").style.color = "white";
     myVideoStream.getVideoTracks()[0].enabled = true;
+    element.classList.add("fa-video");
+    element.classList.remove("fa-video-slash");
+    videoText.innerHTML = "Stop Video";
   }
 };
 
@@ -190,3 +216,64 @@ const addVideoStream = (videoEl, stream, name) => {
     }
   }
 };
+
+function setScreenSharingStream(stream) {
+  myVideo.srcObject = stream;
+  myVideo.muted = true;
+  myVideo.play();
+}
+
+function stopScreenSharingStream() {
+  myVideo.srcObject = myVideoStream;
+  myVideo.muted = false;
+  myVideo.play();
+}
+
+function startScreenShare() {
+  if (screenSharing) {
+    stopScreenSharing();
+  }
+  navigator.mediaDevices.getDisplayMedia({ video: true }).then((stream) => {
+    setScreenSharingStream(stream);
+
+    screenStream = stream;
+    let videoTrack = screenStream.getVideoTracks()[0];
+    videoTrack.onended = () => {
+      stopScreenSharing();
+    };
+    if (peer) {
+      Object.keys(peers).forEach((item) => {
+        currentPeer = peers[item];
+        currentPeer.peerConnection?.getSenders().map((sender) => {
+          if (sender.track.kind == videoTrack.kind) {
+            sender.replaceTrack(videoTrack);
+          }
+        });
+      });
+
+      document.getElementById("screenShare").style.visibility = "hidden";
+      screenSharing = true;
+    }
+  });
+}
+
+function stopScreenSharing() {
+  if (!screenSharing) return;
+  stopScreenSharingStream();
+  let videoTrack = myVideoStream.getVideoTracks()[0];
+  if (peer) {
+    Object.keys(peers).forEach((item) => {
+      currentPeer = peers[item];
+      currentPeer.peerConnection?.getSenders().map((sender) => {
+        if (sender.track.kind == videoTrack.kind) {
+          sender.replaceTrack(videoTrack);
+        }
+      });
+    });
+  }
+  screenStream.getTracks().forEach(function (track) {
+    track.stop();
+  });
+  document.getElementById("screenShare").style.visibility = "visible";
+  screenSharing = false;
+}

@@ -47,15 +47,15 @@
                 </div>
             </div>
             <div class="main_controls">
-                <div class="main_controls_block"></div>
+                
                 <div class="main_controls_block">
-                  <div class="main_controls_button" id="mic" onclick="muteUnmute()">
-                      <i class="fas fa-microphone-slash"></i>
-                      <span>Mute</span>
+                  <div class="main_controls_button" onclick="muteUnmute()">
+                      <i class="fas fa-microphone" id="mute-icon"></i>
+                      <span id="muteText">Mute</span>
                   </div>
-                  <div class="main_controls_button" id="video" onclick="VideomuteUnmute()">
-                      <i class="fas fa-video-slash"></i>
-                      <span>Stop Video</span>
+                  <div class="main_controls_button" onclick="VideomuteUnmute()">
+                      <i class="fas fa-video" id="video-icon"></i>
+                      <span id="videoText">Stop Video</span>
                   </div>
                   <div class="main_controls_button" onclick="showchat()">
                       <i class="fas fa-comment-alt"></i>
@@ -65,12 +65,16 @@
                       <i class="fas fa-user-plus"></i>
                       <span>Invite</span>
                   </div>
+                  <div class="main_controls_button" id="screenShare" onclick="startScreenShare()">
+                      <i class="fas fa-desktop"></i>
+                      <span>Share</span>
+                  </div>
+                  <div class="main_controls_button redColor" onClick="endCall()">
+                      <i class="fas fa-phone"></i>
+                      <span>End Call</span>
+                  </div>
                 </div>
-                <div class="main_controls_block">
-                    <div class="main_controls_button leave_red" onClick="endCall()">
-                        <span class="leave_meeting">Leave Meeting</span>
-                    </div>
-                </div>
+
             </div>
         </div>
         <div class="main_right" id="chat">
