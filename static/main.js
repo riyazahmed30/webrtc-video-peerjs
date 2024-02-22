@@ -59,6 +59,7 @@ navigator.mediaDevices
   .then((stream) => {
     myVideoStream = stream;
     addVideoStream(myVideo, stream, myname);
+    initStreams();
 
     socket.on("user-connected", (id, username) => {
       console.log("userid:" + id);
@@ -167,6 +168,26 @@ const copy = async () => {
 };
 const invitebox = () => {
   $("#getCodeModal").modal("show");
+};
+
+const initStreams = () => {
+  var element = document.getElementById("mute-icon");
+  var muteText = document.getElementById("muteText");
+  if (defaultConfigObj.startWithAudioMuted === "true") {
+    myVideoStream.getAudioTracks()[0].enabled = false;
+    element.classList.add("fa-microphone-slash");
+    element.classList.remove("fa-microphone");
+    muteText.innerHTML = "Unmute";
+  }
+
+  var element1 = document.getElementById("video-icon");
+  var videoText = document.getElementById("videoText");
+  if (defaultConfigObj.startWithVideoMuted === "true") {
+    myVideoStream.getVideoTracks()[0].enabled = false;
+    element1.classList.add("fa-video-slash");
+    element1.classList.remove("fa-video");
+    videoText.innerHTML = "Start Video";
+  }
 };
 
 const muteUnmute = () => {
