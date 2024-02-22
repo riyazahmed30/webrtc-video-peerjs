@@ -317,3 +317,84 @@ function stopScreenSharing() {
   document.getElementById("screenShare").style.visibility = "visible";
   screenSharing = false;
 }
+
+/*
+function getSupportedMimeTypes() {
+  const possibleTypes = [
+    "video/webm;codecs=vp9,opus",
+    "video/webm;codecs=vp8,opus",
+    "video/webm;codecs=h264,opus",
+    "video/mp4;codecs=h264,aac",
+    "video/webm;codecs=av01,opus",
+  ];
+  return possibleTypes.filter((mimeType) => {
+    return MediaRecorder.isTypeSupported(mimeType);
+  });
+}
+
+let mediaRecorder;
+let recordedBlobs;
+
+function handleDataAvailable(event) {
+  console.log("handleDataAvailable", event);
+  if (event.data && event.data.size > 0) {
+    recordedBlobs.push(event.data);
+  }
+}
+
+const recordButton = document.getElementById("recordText");
+const recordingHandle = () => {
+  if (recordButton.textContent === "Start Recording") {
+    startRecording();
+  } else {
+    stopRecording();
+    recordButton.textContent = "Start Recording";
+  }
+};
+
+const download = () => {
+  const blob = new Blob(recordedBlobs, { type: "video/webm" });
+  const url = window.URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.style.display = "none";
+  a.href = url;
+  a.download = "test.webm";
+  document.body.appendChild(a);
+  a.click();
+  setTimeout(() => {
+    document.body.removeChild(a);
+    window.URL.revokeObjectURL(url);
+  }, 100);
+};
+
+function startRecording() {
+  recordedBlobs = [];
+  const mimeType = getSupportedMimeTypes()[0];
+  const options = { mimeType };
+
+  try {
+    mediaRecorder = new MediaRecorder(myVideoStream, options);
+  } catch (e) {
+    console.error("Exception while creating MediaRecorder:", e);
+    console.log(`Exception while creating MediaRecorder: ${JSON.stringify(e)}`);
+    return;
+  }
+
+  console.log("Created MediaRecorder", mediaRecorder, "with options", options);
+  recordButton.textContent = "Stop Recording";
+  mediaRecorder.onstop = (event) => {
+    console.log("Recorder stopped: ", event);
+    console.log("Recorded Blobs: ", recordedBlobs);
+  };
+  mediaRecorder.ondataavailable = handleDataAvailable;
+  mediaRecorder.start();
+  console.log("MediaRecorder started", mediaRecorder);
+}
+
+function stopRecording() {
+  mediaRecorder.stop();
+  setTimeout(() => {
+    download();
+  }, 100);
+}
+*/

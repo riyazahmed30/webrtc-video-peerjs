@@ -44,7 +44,7 @@ video {
   flex: 1;
   object-fit: cover;
   border: 5px solid #000;
-  max-width: 100%;
+  max-width: 600px;
   border-radius: 25px;
 }
 
