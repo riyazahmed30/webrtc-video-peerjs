@@ -8,9 +8,17 @@ let OtherUsername = "";
 chat.hidden = true;
 // myVideo.muted = true;
 
+let defaultConfigObj = {};
+
 window.onload = () => {
   $(document).ready(function () {
-    // $("#getCodeModal").modal("show");
+    let searchStr = window.location.search.substring("1");
+    if (searchStr) {
+      searchStr.split("&").forEach((item) => {
+        const [name, value] = item.split("=");
+        defaultConfigObj[name] = decodeURIComponent(value);
+      });
+    }
   });
 };
 
