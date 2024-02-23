@@ -45,12 +45,10 @@ io.on("connection", (socket) => {
     socket.to(roomId).broadcast.emit("user-connected", id, myname);
 
     socket.on("messagesend", (message) => {
-      console.log(message);
       io.to(roomId).emit("createMessage", message);
     });
 
     socket.on("tellName", (myname) => {
-      console.log(myname);
       socket.to(roomId).broadcast.emit("AddName", myname);
     });
 

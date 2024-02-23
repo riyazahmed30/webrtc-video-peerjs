@@ -4,6 +4,7 @@ const videoGrids = document.getElementById("video-grids");
 const myVideo = document.createElement("video");
 const chat = document.getElementById("chat");
 const isPeerCall = false; // future purpose
+let myname = "";
 let OtherUsername = "";
 chat.hidden = true;
 // myVideo.muted = true;
@@ -20,6 +21,7 @@ window.onload = () => {
         const [name, value] = item.split("=");
         defaultConfigObj[name] = decodeURIComponent(value);
       });
+      myname = defaultConfigObj.name;
     }
 
     if (defaultConfigObj.visitNotesEnabled) {
