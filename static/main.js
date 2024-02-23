@@ -64,7 +64,10 @@ const sendPostMessageToParent = (msgObj) => {
 
 navigator.mediaDevices
   .getUserMedia({
-    video: true,
+    video: {
+      width: { min: 320, ideal: 1280, max: 1280 },
+      height: { min: 180, ideal: 720, max: 720 },
+    },
     audio: true,
   })
   .then((stream) => {
@@ -163,7 +166,11 @@ const connectToNewUser = (userId, streams, myname) => {
 
   if (screenSharing) {
     setTimeout(() => {
-      replaceStreams(call, screenStream);
+      if (isPeerCall) {
+        peer.call(userId, screenStream);
+      } else {
+        replaceStreams(call, screenStream);
+      }
     }, 1000); // dont remove this timeout
   }
 };
@@ -306,7 +313,7 @@ function startScreenShare() {
     let video;
     if (isPeerCall) {
       video = document.createElement("video");
-      addVideoStream(video, stream, "screenshare1");
+      addVideoStream(video, stream, myname);
     } else {
       setScreenSharingStream(stream);
     }
