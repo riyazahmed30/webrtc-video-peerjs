@@ -164,7 +164,7 @@ const connectToNewUser = (userId, streams, myname) => {
   if (screenSharing) {
     setTimeout(() => {
       replaceStreams(call, screenStream);
-    }, 1000); // dont remove this timeout
+    }, 1500); // dont remove this timeout
   }
 };
 
