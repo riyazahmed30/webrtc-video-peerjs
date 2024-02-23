@@ -42,22 +42,22 @@ app.get("/join/:rooms", (req, res) => {
 io.on("connection", (socket) => {
   socket.on("join-room", (roomId, id, myname) => {
     socket.join(roomId);
-    socket.to(roomId).broadcast.emit("user-connected", id, myname);
+    socket.to(roomId).emit("user-connected", id, myname);
 
     socket.on("messagesend", (message) => {
       io.to(roomId).emit("createMessage", message);
     });
 
     socket.on("tellName", (myname) => {
-      socket.to(roomId).broadcast.emit("AddName", myname);
+      socket.to(roomId).emit("AddName", myname);
     });
 
     socket.on("disconnect", () => {
-      socket.to(roomId).broadcast.emit("user-disconnected", id);
+      socket.to(roomId).emit("user-disconnected", id);
     });
 
     socket.on("endCallForAll", () => {
-      socket.to(roomId).broadcast.emit("endCallForAll", id);
+      socket.to(roomId).emit("endCallForAll", id);
     });
   });
 });
