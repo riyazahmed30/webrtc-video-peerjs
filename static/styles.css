@@ -154,6 +154,14 @@ video {
   color: red;
 }
 
+.btnControl:hover {
+  background: none;
+}
+
+.btnControl button {
+  border-radius: 20px;
+}
+
 @keyframes animate {
   0% {
     background-position: 0% 100%;

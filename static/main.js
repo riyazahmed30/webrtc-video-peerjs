@@ -19,6 +19,13 @@ window.onload = () => {
         defaultConfigObj[name] = decodeURIComponent(value);
       });
     }
+
+    if (defaultConfigObj.visitNotesEnabled) {
+      let visitNotesDiv = document.getElementById("visitNotes");
+      visitNotesDiv.classList.add("main_controls_button");
+      visitNotesDiv.innerHTML +=
+        "<button type='button' class='btn btn-primary' onClick='visitNotesClick()'><span>Visit Notes</span></button>";
+    }
   });
 };
 
@@ -241,6 +248,10 @@ const endCallForAll = () => {
   sendPostMessageToParent({ eventType: "endCallForAll" });
   window.location.replace("/");
   socket.emit("endCallForAll", "");
+};
+
+const visitNotesClick = () => {
+  sendPostMessageToParent({ eventType: "visitNotes" });
 };
 
 const addVideoStream = (videoEl, stream, name) => {
