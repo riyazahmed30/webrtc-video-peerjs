@@ -8,6 +8,8 @@ let OtherUsername = "";
 chat.hidden = true;
 // myVideo.muted = true;
 
+document.getElementById("roomid").innerHTML = `<strong>${roomId}</strong>`;
+
 let defaultConfigObj = {};
 
 window.onload = () => {

@@ -10,7 +10,6 @@ const peerServer = ExpressPeerServer(server, {
 });
 const path = require("path");
 
-app.set("view engine", "ejs");
 app.use("/public", express.static(path.join(__dirname, "static")));
 app.use("/peerjs", peerServer);
 
@@ -30,14 +29,14 @@ app.get("/join", (req, res) => {
 app.get("/joinold", (req, res) => {
   res.redirect(
     url.format({
-      pathname: req.query.meeting_id,
+      pathname: `/join/${req.query.meeting_id}`,
       query: req.query,
     })
   );
 });
 
 app.get("/join/:rooms", (req, res) => {
-  res.render("room", { roomid: req.params.rooms, Myname: req.query.name });
+  res.sendFile(path.join(__dirname, "static", "room.html"));
 });
 
 io.on("connection", (socket) => {
