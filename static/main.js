@@ -24,11 +24,13 @@ window.onload = () => {
       myname = defaultConfigObj.name;
     }
 
-    if (defaultConfigObj.visitNotesEnabled) {
-      let visitNotesDiv = document.getElementById("visitNotes");
-      visitNotesDiv.classList.add("main_controls_button");
-      visitNotesDiv.innerHTML +=
+    if (!defaultConfigObj.visitNotesEnabled) {
+      let visitNotesDiv = document.getElementsByClassName("visitNotes");
+      visitNotesDiv[1].classList.add("main_controls_button");
+      visitNotesDiv[1].innerHTML +=
         "<button type='button' class='btn btn-primary' onClick='visitNotesClick()'><span>Visit Notes</span></button>";
+      visitNotesDiv[0].innerHTML +=
+        "<button type='button' class='dropdown-item' onClick='visitNotesClick()'><i class='fas fa-notes-medical'></i><span>Visit Notes</span></button>";
     }
   });
 };
