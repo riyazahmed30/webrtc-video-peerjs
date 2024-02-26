@@ -24,7 +24,7 @@ window.onload = () => {
       myname = defaultConfigObj.name;
     }
 
-    if (!defaultConfigObj.visitNotesEnabled) {
+    if (defaultConfigObj.visitNotesEnabled) {
       let visitNotesDiv = document.getElementsByClassName("visitNotes");
       visitNotesDiv[1].classList.add("main_controls_button");
       visitNotesDiv[1].innerHTML +=
